@@ -1,0 +1,38 @@
+name: Cleanup GHCR
+
+on:
+  # After a PR is closed (merged or not): clean up its images
+  pull_request:
+    types: [closed]
+
+  # Weekly sweep for anything the PR-close trigger may have missed
+  schedule:
+    - cron: '0 3 * * 0'  # every Sunday at 03:00 UTC
+
+  # Manual run — dry_run defaults to true so you can preview before deleting
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'List images to delete without deleting (dry run)'
+        type: boolean
+        default: true
+
+jobs:
+  cleanup:
+    name: Delete non-main images
+    runs-on: ubuntu-latest
+    # Not triggered for fork PRs: GITHUB_TOKEN is read-only there
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Delete non-main GHCR images
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: bash .ops/scripts/ghcr-cleanup.sh
