@@ -1,10 +1,3 @@
-# AGENT.md — dev-cli
-
-Ce projet suit la *Convention de documentation* (`.claude/conventions/doc.md`).
-Avant d'écrire le moindre document ou de proposer un commit, lis-la. En cas de conflit, la convention fait foi.
-
----
-
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
